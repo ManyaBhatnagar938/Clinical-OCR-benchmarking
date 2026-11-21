@@ -1,0 +1,302 @@
+Model,Version,Year,Organization,Paper/Documentation,GitHub,Hugging Face,License,Parameters,OCR type,Architecture,Datasets,Performance,Strengths,Weaknesses,Language,Stable Env,BUGS/NOTES,
+TRADITIONAL (Pipeline based OCR models - usually used CNNs/RNNs ),,,,,,,,,,,,,,,,,,
+DocTR,1.0.1,2021,"Mindee, t2k GmbH",https://mindee.github.io/doctr/,https://github.com/mindee/doctr,https://huggingface.co/spaces/mindee/doctr,Apache 2.0,-,Traditional Pipeline Based,"Two-stage neural network (Detection: DBNet, 
+LinkNet, FAST; Recognition: CRNN, SAR,
+ MASTER, ViTSTR, PARSeq)",,,,,,"Python : 3.12 , PyTorch :2.11.0+cu128
+Hugging Face Hub :1.23.0, Accelerate:1.14.0
+Pillow :11.3.0",-,
+EasyOCR,1.7.2,2024,Jaided.AI,https://www.jaided.ai/easyocr/documentation/,https://github.com/JaidedAI/EasyOCR,-,Apache 2.0,-,Traditional Pipeline Based,CRAFT detector + CRNN recognizer with attention-based decoding. CNN feature extractor followed by recurrent sequence modeling.,-,-,Easy to implement and light weight,"Not benchmarked properly
+no supporting paper",80+ OCR Languages,"torch, torchvision>=0.5
+opencv-python-headless,scipy
+numpy,Pillow,scikit-image,python-bidi
+PyYAML,Shapely,pyclipper,ninja",-,
+PPOCR v6,3.3.0,2026,Baidu Inc,"PP-OCRv6: From 1.5M to 34.5M Parameters, Surpassing Billion-Scale VLMs on OCR Tasks",https://github.com/PaddlePaddle/PaddleOCR,"
+https://huggingface.co/PaddlePaddle",Apache 2.0,-,Traditional Pipeline Based,PaddleOCR pipeline with lightweight detector (DBNet) and recognizer (SVTR-based),In house benchmarks,,"Extremely fast, lightweight, 
+highly accurate, production-ready, 
+excellent CPU performance.","Less effective on complex 
+document understanding compared to 
+OCR-specific VLMs; 
+separate pipeline components instead of end-to-end reasoning.","Supports 50 languages including Simplified
+Chinese, Traditional Chinese, English, 
+Japanese, and various Latin-script languages.",,-,
+Tesseract,5 3.0,"2007, 2014",Independent,An Overview of the Tesseract OCR Engine,https://github.com/tesseract-ocr/tesseract,-,Apache 2.0,-,Traditional Pipeline Based,Traditional OCR engine using LSTM-based text recognition after image preprocessing and page layout analysis,"Tesseract was used as the non-VLM baseline for ClinOCR
+SRORIE Benchmark","Median Word Error Rate (WER) of 0.0866 on normal (clean) scans,
+ but its performance drops significantly on complex data, reaching a 
+WER of 1.0000 (total failure) on rotated and mixed artifacts
+SROIE Benchmark: On receipt recognition,
+Tesseract achieved an F1 score of 54.57% (with 51.93% precision and 57.50% recall), which is notably lower than modern Transformer-based models like TrOCR, which scores above 96% on the same dataset","Lightweight and Efficient: It is described as a lightweight engine 
+that is very easy to run compared to massive, 
+compute-intensive VLMs
+Printed English Proficiency: It is noted for its 
+strong performance on clear, printed English text.","Cursive scripts require deep sequence learning,
+Tesseract struggles with stroke variance for handwritten text",100+ OCR Languages,Python 3.12,-,-
+TRANSFORMER BASED (pipeline based but replaced CNNs with Transformers/End to end using Transformers),,,,,,,,,,,,,,,,,,
+TrOCR,"TrOCR Base (Printed
+and Handwritten models)",2022,Microsoft Corporation,TrOCR: Transformer-based Optical Character Recognition with Pre-trained Models,https://github.com/rsommerfeld/trocr (Unofficial),https://huggingface.co/docs/transformers/en/model_doc/trocr,MIT ,334M,End to End Transformer based,Vision Transformer (ViT) encoder with autoregressive Transformer decoder.,"SRORIE Dataset , IAM Handwriting dataset
+(Aachen’s partition of the dataset) and 8 scene
+text recognition benchmarks","TrOCR achieved significantly higher scores than traditional and modular models.
+TrOCRBASE: F1 score of 96.34% on SRORIE, 
+Achieved a Character Error Rate (CER) of 3.42 while the LARGE version had a 
+CER score of 2.89 which was lowest till then. TrOCR established five new state-of-the-art results out of the eight experiments when fine-tuned with synthetic and benchmark data","Ease of Implementation and Maintenance:
+Its streamlined design avoids complex, multi-stage pre-processing or post-processing steps. It can also be easily 
+extended for multilingual recognition by swapping in a multilingual pre-trained decoder and expanding the dictionary
+Industrial Efficiency: The model family includes a SMALL variant (62M parameters) that provides comparable accuracy to larger versions while being twice as fast, making it ideal for industrial deployment where compute resources are limited","Sensitivity to Symbol Consistency: The model can underperform on datasets where the visual symbols present in an image are omitted from the ground truth (e.g., the IIIT5K dataset)
+Because it is pre-trained to recognize symbols, it may truncate the output 
+or substitute symbols for similar characters when trying to match the 
+length expectations of certain benchmarks
+Performance vs. Ground Truth Conflicts: If a document contains characters (like punctuation or symbols) that the ground truth doesn't expect, the model's tendency to process every visual signal can lead to character-level errors","It can also be easily extended for multilingual 
+by swapping in a multilingual pre-trained decoder","python=3.12, pytorch::pytorch=2.12.0, 
+pytorch::torchvision=0.28.0, pytorch::torchaudio=2.11.0,
+pillow==10.4.0, transformers==4.46.3
+sentencepiece==0.2.2, accelerate == 1.14.0","TrOCR was evaluated using its released handwritten 
+and printed checkpoints on full-page document images. 
+While both models generated coherent text, the outputs 
+consisted of short, hallucinated phrases rather than accurate 
+transcriptions. This behavior is expected because TrOCR is 
+primarily a text recognition model designed for cropped text lines or words, not end-to-end document OCR. Without an upstream text detection and cropping stage, the entire document is resized into a single 384×384 image, causing substantial information loss and poor page-level recognition.",-
+Surya OCR,0.13.0,2024,Datalab,Surya: A lightweight document OCR and analysis toolkit,https://github.com/datalab-to/surya,-,"Apache 2.0 
+(The model weights use a
+modified AI Pubs Open 
+Rail-M license)",650 M,End to End Transformer based,,"OlmOCR bench, ","Achieved 83.3% score on olmOCR-bench; 
+Overall pass rate of 87.2% across 91 languages; 
+Throughput of approximately 5 pages per second 
+on RTX 5090 with vllm. Widely adopted with 50k 
+combined Github stars (with Marker).","Unified manager for layout, recognition, and table tasks; 
+Compact footprint (650M parameters) allows for edge 
+deployment; v2 introduces a unified manager and more 
+structured output schemas (blocks and HTML) to replace line-based outputs; 
+High accuracy on mathematical expressions and complex tables.","High resolution images (above 2048px) may reduce throughput; 
+Baseline server lifecycle can incur startup costs without specific 
+keep-alive flags; Performance is heavily dependent on chosen 
+inference backend (vllm vs llama.cpp).",90+ languages,"python: 3.12, ,transformers: 4.38.2
+PyTorch :2.11.0+cu128, Hugging Face Hub: 0.36.2
+Accelerate :1.14.0, Pillow: 10.4.0",-,
+Docling,2.115.0,2024,IBM,Docling Technical Report,https://github.com/docling-project/docling,https://huggingface.co/docling-project,MIT,-,Document understanding and conversion system,Hybrid (CNN-based layout analysis and Transformer-based table recognition),"OmniDocBenchmark, TSR,DLA benchmarks","Achieves high accuracy on table recognition 
+benchmarks (TSR) and document layout analysis 
+(DLA) tasks, specifically outperforming previous
+ baselines on the OmniDocBench benchmark.","Docling Version 2.0.0 introduces a more 
+robust document understanding pipeline
+ with enhanced multi-page processing 
+and improved LaTeX formula extraction. 
+It supports a wide variety of input formats including PDF, DOCX, and PPTX, and provides seamless integration with RAG and agentic AI systems.","Performance may vary depending 
+on the complexity of hand-written
+annotations within scanned documents.",Multilingual support,"Python:3.12, torch: 2.12..0
+colorlog-6.12.0 doclang-0.7.3
+docling-2.115.0 docling-core-2.87.1 docling-ibm-models-3.13.3 docling-parse-7.8.1 
+docling-slim-2.115.0 faker-40.36.0 filetype-1.2.0 jsonlines-4.0.0 jsonref-1.1.0
+latex2mathml-3.81.0 mail-parser-4.4.0 marko-2.2.3 mpire-2.10.2 polyfactory-3.3.0 pyclipper-1.4.0 pydantic-settings-2.14.2 pylatexenc-2.11 pypdfium2-5.12.1 python-docx-1.2.0 python-pptx-1.0.2 rapidocr-3.9.2 semchunk-3.2.5 tree-sitter-0.26.0 tree-sitter-c-0.24.2 tree-sitter-javascript-0.25.0 tree-sitter-python-0.25.0 tree-sitter-typescript-0.23.2 typer-0.24.2",-,
+Nougat,"Nougat-Base
+(0.1.17)",2023,Meta AI,Nougat: Neural Optical Understanding for Academic Documents,https://github.com/facebookresearch/nougat,https://huggingface.co/docs/transformers/model_doc/nougat,MIT,350M,End to End Transformer based,"Encoder-Decoder Transformer
+ (Swin Transformer encoder and mBART decoder)",arXiv test set,"On arXiv test set: Edit distance 0.071 
+(base) and 0.073 (small); BLEU 89.1 
+(base) and 88.9 (small); F1 93.1 (base) 
+and 92.9 (small). Math modality specific F1: 76.5 (base).","does not require external OCR engines
+or embedded text; excels at preserving
+semantic information of mathematical expressions
+robust to artifacts from hand-scanning mobile devices;
+newer 'base' version slightly outperforms 'small' in table and math modality metrics.","Prone to collapsing into repetitive loops
+during inference; relatively slow generation 
+speed (19.5s per batch) compared to 
+classical tools like GROBID
+lack of cross-page context can lead to inconsistencies in bibliography or section numbering; poor performance on non-Latin script languages.","Predominantly English; 
+supports other Latin-based
+languages 
+(special characters are replaced)","""python=3.12, pytorch::pytorch=2.12.0, 
+pytorch::torchvision=0.28.0, pytorch::torchaudio=2.11.0,
+pillow==10.4.0, transformers==4.46.3
+sentencepiece==0.2.2, accelerate == 1.14.0""",-,
+VISUAL LANGUAGE MODELS (End to End OCR systems specially for OCR),,,,,,,,,,,,,,,,,,
+DotsOCR,dots.mocr,2026,Rednote Lab,"DotsOCR: A Multilingual Vision-Language OCR Model
+Multimodal OCR: Parse Anything from Documents",https://github.com/studio-dots-ai/dots.ocr/tree/master,https://huggingface.co/dots-studio/dots.mocr,MIT,3B,Multilingual Vision-Language OCR / End-to-end document understanding,"It comprises three primary components: a high-resolution vision encoder, a lightweight multimodal connector, and an autoregressive language model (LLM) decoder. For the autoregressive decoder, they use Qwen2.5-1.5B","olmOCR-Bench, OmniDocBench(v1.5), and XDocParse.","Across all three benchmarks, dots.mocr achieves
+the strongest Elo performance among the 
+opensource models.
+new state of the art of 83.9 on olmOCR Bench","(1) it reconstructs both text and graphics as structured outputs,
+enabling more faithful document reconstruction; 
+(2) it supports end-to-end training over heterogeneous document elements, allowing models to exploit semantic
+relations between textual and visual components;
+(3) it converts previously discarded graphics into reusable code-level supervision, unlocking multimodal
+supervision embedded in existing documents. ",-,Supports multiple languages,"PYTHON = ""3.12"", torch==2.7.0,
+torchvision==0.22.0,torchaudio==2.7.0,
+transformers>=4.53,flash-attn==2.8.0.post2,
+datasets,pandas,numpy,Pillow,tqdm","DotsOCR currently has several compatibility issues that make 
+it difficult to run outside the authors' intended environment. 
+The repository assumes the presence of FlashAttention and imports it unconditionally, preventing execution on systems where it is unavailable or unsupported (e.g., NVIDIA T4 GPUs). The vision encoder also contains a hardcoded bfloat16 conversion,
+which causes dtype mismatches when the model is loaded in float16. Finally, when FlashAttention is
+replaced with standard scaled dot-product attention (SDPA) for compatibility, 
+memory consumption increases substantially, often requiring reduced image resolution or fewer visual tokens to avoid GPU out-of-memory errors on 16 GB GPUs.",-
+OlmOCR 2,olmOCR-2-7B-1025 (v0.4.27),2025,Allen Institute for AI,olmOCR 2: Unit Test Rewards for Document OCR,https://github.com/allenai/olmocr,https://huggingface.co/allenai/olmOCR-2-7B-1025,Apache 2.0,7B,OCR-specialized Vision Language Model (VLM),"Base Model: It is built upon the Qwen2.5-VL-7B-Instruct architecture
+Training Method (RLVR): The defining feature of olmOCR 2 is its use of Reinforcement Learning 
+with Verifiable Rewards (RLVR). It is trained using Group Relative Policy Optimization (GRPO), 
+where the reward signal is derived from a suite of binary unit tests rather than
+standard edit distance metrics","olmOCR-Bench, olmOCR-mix-1025:and 
+OmniDocBench v1.6","olmOCR-Bench: 82.4 ± 1.1; ArXiv: 83.0; 
+Old scans math: 82.3; Tables: 84.9; Old scans: 47.7; 
+Headers & footers: 96.1; Multi column: 83.7; 
+Long tiny text: 81.9; Base: 99.7.","Achieves state-of-the-art performance using Reinforcement Learning with 
+Verifiable Rewards (RLVR). Improvements in the newer version include +14.2
+ overall points on olmOCR-Bench, specifically enhancing math formula conversion, 
+table parsing, and multi-column layouts. It utilizes dynamic temperature scaling to 
+mitigate repetition loops and model 'souping' (weight averaging) to maximize performance.","The model is prone to ""looping"" behavior
+where it repeats the same text string infinitely.
+The primary evaluation and the olmOCR-Bench
+ are ""English-language"" focused, and while the base
+ Qwen model is multilingual, the specialized RLVR training emphasizes Latin-script scientific document layouts",English,"Python        : 3.12.13
+PyTorch       : 2.11.0+cpu
+Transformers  : 4.57.3
+Pillow        : 11.3.0
+",,-
+Hunyuan OCR,HunyuanOCR-1.5,2026,Tencent Hy,HunyuanOCR-1.5: Making Lightweight OCR VLMs Faster and Better,https://github.com/Tencent-Hunyuan/HunyuanOCR,https://huggingface.co/tencent/HunyuanOCR,TENCENT HUNYUAN COMMUNITY LICENSE ,1B,Vision-Language OCR model built on multimodal transformer architecture,"Native Vision Transformer (ViT) visual encoder, Adaptive MLP connector,
+ and lightweight Hunyuan-0.5B language model with XD-RoPE.","OmniDOCbench, MORE, TableVerse - 5K,
+DUD, OCRBench, CHAOS-Bench","Achieves 94.74 overall on OmniDocBench v1.6;
+ 91.90 overall on MORE; 78.23 TEDS on TableVerse-5K; 
+54.64 on DUDE; 861 on OCRBench; and 14.15 page-avg recall on 
+CHAOS-Bench. Features a 6.37x speedup in Transformer inference
+and 2.14x speedup under vLLM using DFlash acceleration.","Introduces DFlash-based speculative decoding for inference acceleration,
+ increasing image resolution from 2K to 4K, extending context window to 128K, 
+and adding Agentic Data Flow for better long-tail data construction. 
+It supports PC-side inference via llama.cpp","Absolute recall on CHAOS-Bench (14.15) remains low,
+ indicating that faithfully preserving visually observed but
+ semantically invalid text is still challenging. 
+Evaluated formula parsing may be underestimated due to 
+current matching protocols splitting multi-line formulas.","Supports 331 languages including low-resource
+ multilingual parsing and ancient 
+Chinese scripts (Oracle Bone, Bronze, 
+Seal, Clerical, Regular, Running, Cursive).","torch>=2.1.0, transformers>=4.57.0
+accelerate>=0.34.0 sentencepiece>=0.1.99
+tokenizers>=0.20.0, python == 3.12,
+tensorboard>=2.15.0,tqdm>=4.66.0",-,
+PaddleOCR-VL-1.5,3.7.0,2026,Baidu Inc,PaddleOCR-VL: Boosting Multilingual Document Parsing via a 0.9B Ultra-Compact Vision-Language Model,https://github.com/PaddlePaddle/PaddleOCR,https://huggingface.co/PaddlePaddle/PaddleOCR-VL,Apache 2.0,0.9 B,Visual Language Model,NaViT-style visual encoder with language model for OCR and document understanding.,"OmniDocBench v1.5, OmniDocBench v1.0,
+ChartVQA etc.","OmniDocBench 1.5 :  achieves a top-ranking overall score of 92.86, surpassing the next
+best model, MinerU2.5-1.2B (90.67). Moreover, our model establishes new SOTA results in the
+sub-tasks, including the lowest Text-Edit distance [44] of 0.035, the highest Formula-CDM score
+of 91.22, the leading scores of 90.89 and 94.76 in Table-TEDS and Table-TEDS-S, and the best
+readering ordering scores of 0.043, respectively","Compact yet Powerful VLM Architecture, 
+High-quality Data Construction Methodology;
+dedicated lightweight model for
+layout analysis, focusing specifically on element detection, classification, and reading order
+prediction to reduce problems like hallucination and unstable layout analysis",,109 languages,"Python : 3.12, paddlex : 3.7.0
+paddlepaddle : 3.3.0 , torch: 2.11.0+cu128,
+transformer: 5.13.1 Pillow: 11.3.0,
+accelerate: 1.14.0",-,
+Chandra OCR,0.1.3,2025,Datalab,-,-,https://huggingface.co/datalab-to/chandra,AI PUBS OPEN RAIL-M LICENSE,8B,Lightweight Vision-Language OCR model,"vision encoder with a Qwen-based 
+LLM decoder for structured 
+document generation","OlmOCR benchmark, multilingual benchmark","85.9% on olmOCR benchmark;
+77.8% average on multilingual benchmark (43 languages); ","Excellent layout preservation, 
+handwriting, forms, tables, 
+multilingual OCR, structured outputs.","relatively slow inference,
+commercial restrictions on weights.",,-,"Very large, not possible
+to implement on colab",
+Chandra 2 ,,,Datalab,,https://github.com/datalab-to/chandra,https://huggingface.co/datalab-to/chandra-ocr-2,Apache 2.0/Open Rail-M,,,,,,,,,,,
+DeepSeek OCR,DeepSeek-OCR-3B,2025,DeepSeek.ai,DeepSeek-OCR: Contexts Optical Compression,https://github.com/deepseek-ai/DeepSeek-OCR,https://huggingface.co/deepseek-ai/DeepSeek-OCR,MIT,3B,OCR-specialized Vision Language Model (VLM),"OCR-specific Vision-Language Model 
+with DeepEncoder (compressed vision encoder) 
++ DeepSeek 3B MoE decoder for autoregressive OCR.",,,"Very high OCR accuracy, 
+efficient visual token compression, 
+handles complex layouts, formulas,
+and long documents.","Requires significant GPU memory; 
+full benchmark across all
+ document types is still limited.",Nearly 100 languages.,-,"During benchmarking, the DeepSeek-OCR model 
+showed unstable inference behavior on a subset of 
+handwritten documents. While the initial images were processed within the expected runtime, inferences became progressively slower, with execution time increasing significantly 
+for later samples. In some cases, the model repeatedly 
+generated the same text sequence, leading to excessively long inference times before completion. I think the issue originated from the model's inference implementation. Specifically, the provided inference function relies on a streaming text generation mechanism instead of directly returning decoded OCR output.",-
+DeepSeek OCR 2,,,DeepSeek.ai,,,,,,,,,,,,,,,
+Minuer U2.5,3.4.0,2026,Datalab,MinerU2.5-Pro: Pushing the Limits of Data-Centric Document Parsing at Scale,https://github.com/opendatalab/MinerU,https://huggingface.co/opendatalab/MinerU2.5-1.2B,,1.2B,OCR-specialized Vision Language Model (VLM),,,,,,,,,
+GotOCR 2.0,-,2024,stepfun-ai,"General OCR Theory: Towards OCR-2.0
+via a Unified End-to-end Model",https://github.com/Ucas-HaoranWei/GOT-OCR2.0,https://huggingface.co/stepfun-ai/GOT-OCR2_0,Apache 2.0,580M,OCR Specific Vision Language Model,"GOT comprises three modules, i.e., 
+an image encoder, a linear layer, and
+an output decoder. The linear layer acts as the
+connector to map the channel dimension between
+the vision encoder and the language decoder","Fox Benchmark, ChartQA, PlotQA",advanced performance on pure text OCR,-,-,English and Chinese,"Python: 3.12, Transformers == 4.45.2
+verovio-6.2.1, sentencepiece-0.2.2
+accerelate: 1.14.0",-,
+Unlimited OCR,,2023,Baidu Inc,Unlimited OCR Works,https://github.com/baidu/Unlimited-OCR,https://huggingface.co/baidu/Unlimited-OCR,MIT,,,,,,,,,"Python : 3.12 torch==2.10.0
+torchvision==0.25.0, transformers==4.57.1
+Pillow==12.1.1, matplotlib==3.10.8
+einops==0.8.2, addict==2.4.0,easydict==1.13
+pymupdf==1.27.2.2,psutil==7.2.2",-,
+GENERAL VISUAL LANGUAGE MODELS (have other purposes but can be used for OCR as well),,,,,,,,,,,,,,,,,,
+Florence 2,Florence-2-base,2024,"Azure AI, Microsoft",Florence-2: Advancing a Unified Representation for a Variety of Vision Tasks,-,https://huggingface.co/microsoft/Florence-2-base,MIT,0.23B,Vision-Language Transformer trained for dozens of vision tasks including OCR,"Florence-2 consists of an image encoder and standard 
+multi-modality encoder-decoder. We train Florence-2 on our 
+FLD-5B data in a unified multitask learning paradigm, 
+resulting in a generaslist vision foundation model, which can 
+perform various vision tasks.","COCO Caption, COCO Obj detection, 
+RefCOCO Referring Expression Segmentation (RES),
+TextVQA, Other VQA Benchmarks
+Flickr30k (Visual Grounding), ADE20K Semantic Segmentation","COCO caption:  reached a 143.3 CIDEr score
+It set a new SOTA with 81.5% accuracy without requiring external 
+OCR token input on TextVQA , When used as a
+ pre-trained backbone, it surpassed supervised 
+models on COCO detection","Unified Architecture: It uses a single set of weights and a sequence-to-sequence learning paradigm to handle diverse tasks (captioning, detection, grounding, segmentation) through text prompts
+Compact Efficiency: Despite having relatively few parameters (0.23B to 0.77B), it competes with or outperforms specialist models that are over 100× larger (e.g., Flamingo 80B)
+Superior Spatial Grounding: The model excels at capturing spatial hierarchy and semantic granularity, allowing for precise bounding box and polygon mask generation
+High Training Efficiency: Compared to models pre-trained on ImageNet, Florence-2 improves training efficiency 
+by 4× for downstream tasks while achieving better accuracy","While Florence-2 is more precise than many larger
+ VLMs, general-purpose models can still be susceptible 
+to hallucinations in dense text regions compared to 
+domain-specific OCR models that use decoupled 
+parsing strategies","The Florence-2 pretraining emphasizes
+English and has comparatively limited 
+exposure to non-Latin scripts.","Python : 3.12, PyTorch :2.11.0+cpu
+Hugging Face Hub  : 0.36.2
+Accelerate :1.14.0, Pillow :11.3.0,
+Transformers: 4.49.0, tokensizers: 0.21.0",-,
+InternVL2,InternVL2-1B,2024,OpenGVLab,https://internvl.github.io/blog/2024-07-02-InternVL-2.0/,https://github.com/OpenGVLab/InternVL,https://huggingface.co/OpenGVLab/InternVL2-1B,MIT,1B,Large multimodal model with a vision encoder + LLM.,"Combines a Vision Transformer (ViT) encoder 
+with a large language model through a multimodal connector.
+ It processes both images and text jointly, enabling OCR, 
+visual question answering, and document understanding 
+within a single framework. Unlike traditional OCR pipelines, 
+it generates text autoregressively by reasoning over visual features. 
+The 1B-parameter version is designed as a lightweight model
+balancing multimodal capability with relatively lower computational requirements.","MMMU, MathVista, AI2D, ChartQA
+DocVQA, InfoVQA, OCRBench , MMB-EN","InternVL2 demonstrates powerful capabilities
+ in handling complex multimodal data, excelling
+ in tasks such as mathematics, scientific charts
+,general charts, documents, infographics, and OCR. 
+For instance, InternVL2 achieves an accuracy of 66.3% 
+on the MathVista benchmark, significantly surpassing other closed-source commercial models and open-source models. 
+Moreover, InternVL2 achieves state-of-the-art 
+performance across a wide range of benchmarks, including the general chart benchmark ChartQA, the document benchmark DocVQA, the infographic benchmark InfographicVQA, and the general visual question answering benchmark MMBench.","Progressive with larger language models
+Multimodal input
+model supports various output formats, 
+such as images, bounding boxes, and masks,
+demonstrating extensive versatility. By
+connecting the MLLM with multiple downstream 
+task decoders, InternVL2 can be generalized 
+to hundreds of vision-language tasks while achieving performance comparable to expert models.","InternVL2-1B exhibited relatively high transcription 
+errors on ClinOCR, particularly for dense text
+ and complex document layouts, resulting in a
+ CER of 0.582. Its autoregressive text generation 
+occasionally also added omissions, repetitions,
+ or formatting inconsistencies that increased 
+edit-distance-based metrics. 
+Compared to dedicated OCR models, inference was also considerably slower","multilingual vision-language model 
+capable of recognizing text in multiple
+languages and scripts (including English, 
+Chinese, Japanese, Korean and 
+numerous Latin-script languages)","python : 3.12, accelerate-1.9.0
+decord-0.6.0, PyTorch: 2.11.0+cpu
+huggingface_hub-0.36.2
+tokenizers-0.21.4, transformers-4.55.4",-,
+Qwen2.5-VL,Qwen2.5-VL-3B-Instruct,2024,Qwen,Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution,https://github.com/QwenLM/Qwen3-VL,https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct,Apache 2.0,3B,General Vision Language Model,"consists of a Vision Transformer 
+(ViT)-based image encoder, a 
+multimodal projector, and the Qwen2.5-3B
+ decoder-only Large Language Model.","MMMU, MathVista, AI2D, ChartQA
+DocVQA, InfoVQA, OCRBench , MMB-EN, 
+Video benchmarks like LVBench, VideoMME
+and agentic benchmarks","Notable results include
+93.9 on DocVQA
+and good reuslts on TextVQA and MathVista","Qwen2.5-VL directly plays as a visual agent 
+that can reason and dynamically direct tools, 
+which is capable of computer use and phone use.
+Qwen2.5-VL can comprehend videos of over 1 hour,
+and this time it has a new ability of cpaturing event by pinpointing the relevant video segments.
+accurately localize objects in an image by generating bounding boxes or points","Not specifically optimized for OCR, so character-level 
+transcription is generally less accurate than dedicated
+OCR models.
+Autoregressive decoding can introduce hallucinations, 
+omissions, or formatting inconsistencies.
+Slower inference than traditional OCR engines.",100+ languages,"Python : 3.12, acclerate: 1.9.0
+torch: 2.11.0, av-18.0.0
+pillow-12.3.0
+qwen-vl-utils-0.0.14
+transformers-5.14.1",,
