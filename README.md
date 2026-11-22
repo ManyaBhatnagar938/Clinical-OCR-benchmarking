@@ -148,6 +148,13 @@ Among models evaluated across the full benchmark, PP-OCRv6 achieved the lowest a
 
 Several VLM-based models achieved relatively high F1-scores despite higher CER values. PaddleOCR-VL-0.9B, HunyuanOCR, and Unlimited-OCR had CER values of approximately 0.440, 0.395, and 0.394, respectively. This divergence highlights that different evaluation metrics capture different aspects of transcription quality. A high F1-score does not necessarily imply a low character-level edit distance, particularly when insertions, substitutions, or formatting differences affect the predicted text.
 
+
+<img width="1226" height="738" alt="image" src="https://github.com/user-attachments/assets/a7f15c6e-5e76-4ad6-b984-8ef1f94bd553" />
+
+
+<img width="857" height="356" alt="image" src="https://github.com/user-attachments/assets/f4b6c343-f461-47c4-b5d4-6cfee5f37290" />
+
+
 2. Document-Level Wins and Pairwise Comparisons
 
 Average CER and document-level wins reveal different aspects of model performance. Chandra-OCR-2 achieved the lowest CER on approximately 69 individual documents, followed by Unlimited-OCR (31), PaddleOCR-VL-0.9B (24), and HunyuanOCR (17). Despite its high number of document-level wins, Chandra-OCR-2 had an average CER of approximately 0.54, considerably higher than PP-OCRv6 and docTR.
@@ -165,6 +172,8 @@ In contrast, Chandra-OCR-2 and olmOCR-2 required approximately 137 and 145 secon
 
 PP-OCRv6 and docTR therefore offer an interesting balance between average CER and inference time in this evaluation. Runtime measurements remain dependent on hardware, model configuration, implementation, and the environment in which inference was performed.
 
+<img width="1157" height="587" alt="image" src="https://github.com/user-attachments/assets/5d10a86f-6b15-4f9d-881e-f618dd8bea8c" />
+
 
 4. Performance Across Document Types
 
@@ -173,6 +182,9 @@ Handwritten documents were consistently the most challenging subset for nearly e
 Table-rich documents also presented challenges for several models, including DeepSeek-OCR-2, DotsOCR, MinerU2.5-1.2B, and Chandra-OCR-2. Some conventional OCR systems performed comparatively well on these documents.
 
 PaddleOCR-VL-0.9B, HunyuanOCR, Unlimited-OCR, and olmOCR-2 also showed substantial variation across document types. Their overall CER was therefore influenced by the mixture of normal, handwritten, and table documents in the benchmark. Normal printed documents generally produced lower error rates, consistent with DeepSeek-OCR-3B's strong performance on that subset.
+
+<img width="1456" height="606" alt="image" src="https://github.com/user-attachments/assets/522c7e9b-dbfa-4958-8696-057b6ce289a5" />
+
 
 5. Effect of Document Length
 
